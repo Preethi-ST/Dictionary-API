@@ -1,3 +1,28 @@
+let page = 
+`<div class="container">
+<div class="row">
+  <div class="col-lg-5 col-md-4 col-sm-12 pb-4">
+    <div class="text pt-4">
+      <h3>Try It</h3>
+      <p>Enter a word to lookup and learn with examples and images for all possible</p>
+    </div>
+    <div class="getInput pt-4">
+      <form>
+        <div class="form-group">
+          <label>Enter a Word</label>
+          <input type="text" pattern="[a-zA-Z]+" class="form-control" id="word" placeholder="Alphabets only" title="Enter only alphabets" />
+          <div class="invalid-feedback">word is required</div>
+        </div>
+        <button class="btn btn-success btn-block" id="mybutton">Go &nbsp;<i class="fa fa-arrow-right" aria-hidden="true"></i></button>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-7 col-md-8 col-sm-12 py-5" id="mycolumn">
+    
+  </div>
+</div>
+</div>`;
+document.getElementsByClassName('mygrid')[0].innerHTML = page;
 //to create DOM elements
 function createMyElement(elem, elemClass = "", elemId = "") {
   let element = document.createElement(elem);
@@ -8,8 +33,8 @@ function createMyElement(elem, elemClass = "", elemId = "") {
 let printDefinitions = (count,outputDiv,data) =>{
   for(i=0;i<count;i++){
     let defdiv = createMyElement('div','word_def py-3');
-    outputDiv.append(defdiv);
-    
+    outputDiv.append(defdiv);                    /* to add scroll bar */
+    outputDiv.classList.add('overflow');   
     let p1 = createMyElement('p',"mypara pb-2");
     p1.innerHTML = `<p class="font-weight-bold text-dark">Definition </p>${data.definitions[i]['definition']}`;
     
@@ -26,8 +51,11 @@ let printDefinitions = (count,outputDiv,data) =>{
   }
 }
 let displayOutput = (data) =>{
+  let mycol = document.getElementById('mycolumn');
+  let mydiv = createMyElement('div',"",'result_division');
+  mycol.appendChild(mydiv);
   let outputDiv = document.getElementById('result_division');
-  outputDiv.classList.add('overflow');                           /* to add scroll bar */
+                         
   document.querySelector('#result_division').innerHTML = "";
   let entered_word = createMyElement('h2','font-weight-bold text-center outputFont pb-2');
   entered_word.innerText = data.word.toUpperCase();
@@ -45,11 +73,6 @@ let displayOutput = (data) =>{
 document.getElementById('mybutton').addEventListener('click',function(e){
   e.preventDefault();
   let word = document.getElementById('word').value;
-  console.log(word);
-  if(word.length === 0){
-    document.getElementById('word').classList.add('is-invalid');
-  }
-  else{
     document.getElementById('word').classList.remove('is-invalid');
     let fetchData = async (word) =>{
       try{
@@ -59,12 +82,26 @@ document.getElementById('mybutton').addEventListener('click',function(e){
             Authorization: "Token 77c356edf96581b7c1a7de0bb4728121c5a486be"
         }});
         let data = await resp.json();
-        displayOutput(data);
+        console.log(data);
+        if(data){
+          displayOutput(data);
+        }
+        
       }
       catch(err){
         console.log(err);
+        console.log("word "+ typeof word);
+        if(word === ""){
+          document.getElementById('word').classList.add('is-invalid');
+        }
+        else if(!word.match(/^[A-Za-z]+$/)){
+          alert("Enter only Alphabets");
+        }
+        else{
+          alert("Make sure to give proper input with right spelling");
+        }
       }
     }
     fetchData(word);
-  }
+  
 })
